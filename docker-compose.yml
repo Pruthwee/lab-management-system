@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  lab-management-system:
+    image: lab-management-system:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lab-management-system
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - TZ=UTC
+      - JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Xms256m -Xmx512m
+      # Database connection - provide via .env file or environment
+      - DB_HOST=${DB_HOST:-localhost}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-labdb}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-}
+      - DB_URL=${DB_URL:-jdbc:postgresql://${DB_HOST:-localhost}:${DB_PORT:-5432}/${DB_NAME:-labdb}}
+      # Application configuration
+      - SERVER_PORT=8080
+      - API_BASE_URL=${API_BASE_URL:-http://localhost:8080}
+      # Storage configuration
+      - LAB_DATA_PATH=${LAB_DATA_PATH:-/app/data}
+      - LAB_BACKUP_PATH=${LAB_BACKUP_PATH:-/app/backup}
+      - LAB_REPORTS_PATH=${LAB_REPORTS_PATH:-/app/reports}
+      # Equipment configuration
+      - EQUIPMENT_DEFAULT_IP=${EQUIPMENT_DEFAULT_IP:-192.168.1.100}
+      - EQUIPMENT_DEFAULT_PORT=${EQUIPMENT_DEFAULT_PORT:-8888}
+    volumes:
+      - lab-data:/app/data
+      - lab-reports:/app/reports
+      - lab-logs:/app/logs
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  lab-data:
+  lab-reports:
+  lab-logs:
+
+networks:
+  app-network:
+    driver: bridge

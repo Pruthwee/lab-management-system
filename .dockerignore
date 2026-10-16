@@ -1,0 +1,57 @@
+# Java build artifacts
+target/
+*.class
+
+# Git
+.git/
+.gitignore
+
+# Maven wrapper - NEVER include in Docker builds
+mvnw
+mvnw.cmd
+.mvn/
+
+# Gradle wrapper - NEVER include in Docker builds
+gradlew
+gradlew.bat
+gradle/wrapper/
+.gradle/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+docs/
+
+# Test files
+src/test/
+
+# Logs
+logs/
+*.log
+
+# Kubernetes manifests (not needed in image)
+kubernetes/
+
+# Scripts (not needed in image)
+scripts/
+
+# Environment files
+.env
+.env.*
+
+# Temporary files
+tmp/
+temp/
