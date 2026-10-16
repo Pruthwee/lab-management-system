@@ -10,25 +10,31 @@ import javax.sql.DataSource;
 @Configuration
 public class DatabaseConfig {
 
-    // VIOLATION: Cloud Compatibility - Hardcoded database host and port
+    // Migrated from file-based H2 to network-accessible PostgreSQL via environment variables
     @Bean
     @ConfigurationProperties("spring.datasource")
     public DataSourceProperties dataSourceProperties() {
         DataSourceProperties properties = new DataSourceProperties();
-        properties.setUrl("jdbc:h2:mem:testdb;MODE=Oracle");
-        properties.setUsername("sa");
-        properties.setPassword("");
+        properties.setUrl(System.getenv().getOrDefault("DB_URL",
+                "jdbc:postgresql://" + System.getenv().getOrDefault("DB_HOST", "localhost")
+                + ":" + System.getenv().getOrDefault("DB_PORT", "5432")
+                + "/" + System.getenv().getOrDefault("DB_NAME", "labdb")));
+        properties.setUsername(System.getenv().getOrDefault("DB_USERNAME", "postgres"));
+        properties.setPassword(System.getenv().getOrDefault("DB_PASSWORD", ""));
         return properties;
     }
 
     @Bean
     public DataSource dataSource(DataSourceProperties properties) {
-        // VIOLATION: Database Dependency - Oracle mode for H2
+        // Migrated from file-based H2 (org.h2.Driver) to network-accessible PostgreSQL
         return DataSourceBuilder.create()
-                .driverClassName("org.h2.Driver")
-                .url("jdbc:h2:mem:testdb;MODE=Oracle;DATABASE_TO_UPPER=false")
-                .username("sa")
-                .password("")
+                .driverClassName("org.postgresql.Driver")
+                .url(System.getenv().getOrDefault("DB_URL",
+                        "jdbc:postgresql://" + System.getenv().getOrDefault("DB_HOST", "localhost")
+                        + ":" + System.getenv().getOrDefault("DB_PORT", "5432")
+                        + "/" + System.getenv().getOrDefault("DB_NAME", "labdb")))
+                .username(System.getenv().getOrDefault("DB_USERNAME", "postgres"))
+                .password(System.getenv().getOrDefault("DB_PASSWORD", ""))
                 .build();
     }
 }

@@ -4,19 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
-/**
- * Controller classes have been extracted to separate files:
- * - LabResultController.java
- * - SpecimenController.java
- * - LabTestController.java
- * - PatientController.java
- * - EquipmentController.java
- * - ReagentController.java
- * - AuditController.java
- *
- * This file now contains only the HealthController for backward compatibility.
- */
-
 @RestController
 @RequestMapping("/")
 public class HealthController {

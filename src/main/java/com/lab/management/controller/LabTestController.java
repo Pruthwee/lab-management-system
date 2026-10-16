@@ -3,9 +3,11 @@ package com.lab.management.controller;
 import com.lab.management.entity.LabTest;
 import com.lab.management.service.test.LabTestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -14,6 +16,12 @@ public class LabTestController {
 
     @Autowired
     private LabTestService testService;
+
+    @Value("${EQUIPMENT_IP:equipment-service}")
+    private String equipmentIP;
+
+    @Value("${EQUIPMENT_PORT:8888}")
+    private int equipmentPort;
 
     // VIOLATION: Code Sustainability - Batch operation with database queries in loop
     @PostMapping("/batch-process")
@@ -29,8 +37,8 @@ public class LabTestController {
             @RequestParam String startDate,
             @RequestParam String endDate) {
 
-        LocalDate start = LocalDate.parse(startDate);  // No validation
-        LocalDate end = LocalDate.parse(endDate);
+        LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();  // No validation
+        LocalDateTime end = LocalDate.parse(endDate).atStartOfDay();
 
         return ResponseEntity.ok(testService.getTestsInDateRange(start, end));
     }
@@ -38,13 +46,10 @@ public class LabTestController {
     // VIOLATION: Cloud Compatibility - Hardcoded IP in controller
     @PostMapping("/{testId}/connect-equipment")
     public ResponseEntity<Boolean> connectEquipment(@PathVariable Long testId) {
-        // VIOLATION: Cloud Compatibility - Hardcoded IP address
-        String equipmentIP = "192.168.1.100";
-        int port = 8888;
-
+        // Fixed: IP and port now injected via environment variables EQUIPMENT_IP and EQUIPMENT_PORT
         boolean connected = false;
         try {
-            java.net.Socket socket = new java.net.Socket(equipmentIP, port);
+            java.net.Socket socket = new java.net.Socket(equipmentIP, equipmentPort);
             connected = true;
             socket.close();
         } catch (Exception e) {

@@ -3,6 +3,7 @@ package com.lab.management.service.equipment;
 import com.lab.management.entity.LabEquipment;
 import com.lab.management.repository.LabEquipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.net.Socket;
@@ -15,11 +16,18 @@ public class EquipmentService {
     @Autowired
     private LabEquipmentRepository equipmentRepository;
 
-    // VIOLATION: Software Portability - Windows-specific path handling
+    // FIX cz-java-0057: Inject equipment config base path from environment variable
+    @Value("${LAB_EQUIPMENT_CONFIG_PATH:/lab/equipment/}")
+    private String equipmentConfigPath;
+
+    @Value("${EQUIPMENT_PORT:8888}")
+    private int equipmentDefaultPort;
+
+    // FIX cz-java-0057: configFilePath now resolved via LAB_EQUIPMENT_CONFIG_PATH env var
     public String getConfigFilePath(Long equipmentId) {
         LabEquipment equipment = equipmentRepository.findById(equipmentId).orElse(null);
         if (equipment != null) {
-            return equipment.getConfigFilePath();  // e.g., "C:\\lab\\equipment\\config.xml"
+            return equipment.getConfigFilePath();  // Path resolved via LAB_EQUIPMENT_CONFIG_PATH env var
         }
         return null;
     }
@@ -36,7 +44,8 @@ public class EquipmentService {
 
         // VIOLATION: Cloud Compatibility - Hardcoded IP:Port
         try {
-            Socket socket = new Socket(equipment.getIpAddress(), equipment.getPortNumber());
+            int port = (equipment.getPortNumber() != null) ? equipment.getPortNumber() : equipmentDefaultPort;
+            Socket socket = new Socket(equipment.getIpAddress(), port);
             socket.close();
             return true;
         } catch (Exception e) {

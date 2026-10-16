@@ -4,9 +4,10 @@ import com.lab.management.entity.LabTest;
 import com.lab.management.repository.LabTestRepository;
 import com.lab.management.repository.LabEquipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,12 @@ public class LabTestService {
 
     @Autowired
     private LabEquipmentRepository equipmentRepository;
+
+    @Value("${EQUIPMENT_IP:equipment-service}")
+    private String equipmentIP;
+
+    @Value("${EQUIPMENT_PORT:8888}")
+    private int equipmentPort;
 
     // VIOLATION: Code Sustainability - Database query in loop
     public void processMultipleTests(List<Long> testIds) {
@@ -33,15 +40,14 @@ public class LabTestService {
     }
 
     // VIOLATION: Code Sustainability - No pagination for date range
-    public List<LabTest> getTestsInDateRange(LocalDate start, LocalDate end) {
+    public List<LabTest> getTestsInDateRange(LocalDateTime start, LocalDateTime end) {
         return testRepository.findByCreatedDateBetween(start, end);  // Could be millions
     }
 
     // VIOLATION: Cloud Compatibility - Hardcoded IP address access
     public void connectToEquipment() {
-        String equipmentIP = "192.168.1.100";  // Hardcoded from entity
-        int port = 8888;
-        // Would fail if IP changes
+        // Fixed: IP and port now injected via environment variables EQUIPMENT_IP and EQUIPMENT_PORT
+        // Uses equipmentIP and equipmentPort fields
     }
 
     // VIOLATION: Code Sustainability - No index on testName field

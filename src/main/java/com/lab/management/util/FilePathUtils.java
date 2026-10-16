@@ -1,49 +1,53 @@
 package com.lab.management.util;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 public class FilePathUtils {
 
-    // VIOLATION: Software Portability - Windows-specific paths
-    // This utility should eventually use File.separator and Paths.get()
+    // FIX cz-java-0057: Replaced hardcoded Windows absolute paths with environment variables
+    // Paths are now injected via Kubernetes ConfigMap environment variables on EKS
 
-    private static final String LAB_DATA_PATH = "C:\\lab\\data\\";
-    private static final String LAB_BACKUP_PATH = "C:\\lab\\backup\\";
-    private static final String LAB_REPORTS_PATH = "C:\\lab\\reports\\";
+    private static final String LAB_DATA_PATH = System.getenv("LAB_DATA_PATH") != null ? System.getenv("LAB_DATA_PATH") : "/lab/data/";
+    private static final String LAB_BACKUP_PATH = System.getenv("LAB_BACKUP_PATH") != null ? System.getenv("LAB_BACKUP_PATH") : "/lab/backup/";
+    private static final String LAB_REPORTS_PATH = System.getenv("LAB_REPORTS_PATH") != null ? System.getenv("LAB_REPORTS_PATH") : "/lab/reports/";
 
     /**
-     * Get lab data path (VIOLATION: Windows-only)
+     * Get lab data path - resolved from LAB_DATA_PATH environment variable
      */
     public static String getLabDataPath() {
         return LAB_DATA_PATH;
     }
 
     /**
-     * Get lab backup path (VIOLATION: Windows-only)
+     * Get lab backup path - resolved from LAB_BACKUP_PATH environment variable
      */
     public static String getLabBackupPath() {
         return LAB_BACKUP_PATH;
     }
 
     /**
-     * Get lab reports path (VIOLATION: Windows-only)
+     * Get lab reports path - resolved from LAB_REPORTS_PATH environment variable
      */
     public static String getLabReportsPath() {
         return LAB_REPORTS_PATH;
     }
 
     /**
-     * Get equipment config path (VIOLATION: Windows-only)
+     * Get equipment config path - resolved from LAB_EQUIPMENT_CONFIG_PATH environment variable
+     * FIX cz-java-0057: Replaced hardcoded Windows path with environment variable
      */
     public static String getEquipmentConfigPath(String filename) {
-        return "C:\\lab\\equipment\\" + filename;
+        String equipmentConfigPath = System.getenv("LAB_EQUIPMENT_CONFIG_PATH") != null ? System.getenv("LAB_EQUIPMENT_CONFIG_PATH") : "/lab/equipment/";
+        return equipmentConfigPath + filename;
     }
 
     /**
      * Get specimen storage path
      */
+    // FIX cz-java-0067: Replaced platform-specific File.separator with cross-platform Paths.get() (Java NIO)
     public static String getSpecimenPath(Long specimenId) {
-        return LAB_DATA_PATH + File.separator + "specimens" + File.separator + specimenId + ".img";
+        return Paths.get(LAB_DATA_PATH, "specimens", specimenId + ".img").toString();
     }
 
     /**

@@ -4,6 +4,7 @@ import com.lab.management.entity.Specimen;
 import com.lab.management.repository.SpecimenRepository;
 import com.lab.management.repository.LabTestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
@@ -21,6 +22,10 @@ public class SpecimenService {
     @Autowired
     private LabTestRepository testRepository;
 
+    // FIX cz-java-0057: Inject specimen storage base path from environment variable
+    @Value("${LAB_SPECIMENS_PATH:/lab/specimens/}")
+    private String specimenStoragePath;
+
     // VIOLATION: Code Sustainability - No pagination, loads all specimens
     public List<Specimen> getAllSpecimens() {
         return specimenRepository.findAll();  // Could be millions of records
@@ -28,8 +33,8 @@ public class SpecimenService {
 
     // VIOLATION: Cloud Compatibility - Using local file system path
     public void storeSpecimenLocally(Specimen specimen, byte[] imageData) {
-        // VIOLATION: Software Portability - Windows-specific path
-        String filePath = "C:\\lab\\specimens\\" + specimen.getSpecimenId() + ".img";
+        // FIX cz-java-0057: Use environment variable for specimen storage path
+        String filePath = specimenStoragePath + specimen.getSpecimenId() + ".img";
         specimen.setLocalStoragePath(filePath);
         specimenRepository.save(specimen);
     }
