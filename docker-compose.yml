@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  lab-management-system:
+    image: lab-management-system:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SERVER_PORT=8080
+      - DB_URL=${DB_URL:jdbc:h2:mem:testdb}
+      - DB_USERNAME=${DB_USERNAME:?set DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD:?set DB_PASSWORD}
+      - DATA_PATH=/app/data
+      - BACKUP_PATH=/app/backup
+      - REPORTS_PATH=/app/reports
+      - LOG_PATH=/app/logs
+      - EQUIPMENT_IP=${EQUIPMENT_IP:192.168.1.100}
+      - EQUIPMENT_PORT=${EQUIPMENT_PORT:8888}
+      - SERVER_HOST=${SERVER_HOST:10.0.0.50}
+      - SERVER_PORT=${SERVER_PORT:5000}
+      - API_BASE_URL=${API_BASE_URL:http://localhost:8080}
+    volumes:
+      - lab-data:/app/data
+      - lab-logs:/app/logs
+volumes:
+  lab-data:
+  lab-logs:

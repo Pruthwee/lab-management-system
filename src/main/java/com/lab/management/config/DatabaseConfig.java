@@ -15,7 +15,7 @@ public class DatabaseConfig {
     @ConfigurationProperties("spring.datasource")
     public DataSourceProperties dataSourceProperties() {
         DataSourceProperties properties = new DataSourceProperties();
-        properties.setUrl("jdbc:h2:mem:testdb;MODE=Oracle");
+        properties.setUrl(System.getenv().getOrDefault("DB_URL", "jdbc:h2:mem:testdb"));
         properties.setUsername("sa");
         properties.setPassword("");
         return properties;
@@ -26,7 +26,7 @@ public class DatabaseConfig {
         // VIOLATION: Database Dependency - Oracle mode for H2
         return DataSourceBuilder.create()
                 .driverClassName("org.h2.Driver")
-                .url("jdbc:h2:mem:testdb;MODE=Oracle;DATABASE_TO_UPPER=false")
+                .url(System.getenv().getOrDefault("DB_URL", "jdbc:h2:mem:testdb"))
                 .username("sa")
                 .password("")
                 .build();

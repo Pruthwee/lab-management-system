@@ -15,6 +15,6 @@ public class WebConfig {
     // VIOLATION: Software Portability - Windows-specific file paths
     @Bean
     public String getLabDataPath() {
-        return "C:\\lab\\data\\";  // Windows-only path
+        return System.getenv().getOrDefault("DATA_PATH", "/app/data") + "/";  // Resolved from environment
     }
 }

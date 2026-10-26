@@ -1,0 +1,69 @@
+{
+  "family": "lab-management-system-task",
+  "requiresCompatibilities": ["FARGATE"],
+  "networkMode": "awsvpc",
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::{{ACCOUNT_ID}}:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::{{ACCOUNT_ID}}:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "lab-management-system",
+      "image": "{{IMAGE_URI}}",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "SPRING_PROFILES_ACTIVE", "value": "prod" },
+        { "name": "SERVER_PORT", "value": "8080" },
+        { "name": "DATA_PATH", "value": "/app/data" },
+        { "name": "BACKUP_PATH", "value": "/app/backup" },
+        { "name": "REPORTS_PATH", "value": "/app/reports" },
+        { "name": "LOG_PATH", "value": "/app/logs" },
+        { "name": "EQUIPMENT_IP", "value": "192.168.1.100" },
+        { "name": "EQUIPMENT_PORT", "value": "8888" },
+        { "name": "SERVER_HOST", "value": "10.0.0.50" },
+        { "name": "SERVER_PORT", "value": "5000" },
+        { "name": "API_BASE_URL", "value": "http://localhost:8080" }
+      ],
+      "secrets": [
+        { "name": "DB_URL", "valueFrom": "{{DB_URL_SECRET_ARN}}" },
+        { "name": "DB_USERNAME", "valueFrom": "{{DB_USERNAME_SECRET_ARN}}" },
+        { "name": "DB_PASSWORD", "valueFrom": "{{DB_PASSWORD_SECRET_ARN}}" }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "efs-data",
+          "containerPath": "/app/data",
+          "readOnly": false
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/lab-management-system",
+          "awslogs-region": "{{AWS_REGION}}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "name": "efs-data",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "{{EFS_FILE_SYSTEM_ID}}",
+        "rootDirectory": "/",
+        "transitEncryption": "ENABLED",
+        "authorizationConfig": {
+          "accessPointId": "{{EFS_ACCESS_POINT_ID}}",
+          "iam": "ENABLED"
+        }
+      }
+    }
+  ]
+}

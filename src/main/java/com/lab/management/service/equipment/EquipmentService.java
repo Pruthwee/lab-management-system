@@ -19,7 +19,7 @@ public class EquipmentService {
     public String getConfigFilePath(Long equipmentId) {
         LabEquipment equipment = equipmentRepository.findById(equipmentId).orElse(null);
         if (equipment != null) {
-            return equipment.getConfigFilePath();  // e.g., "C:\\lab\\equipment\\config.xml"
+            return equipment.getConfigFilePath();  // e.g., "/app/data/equipment/config.xml" from DATA_PATH
         }
         return null;
     }

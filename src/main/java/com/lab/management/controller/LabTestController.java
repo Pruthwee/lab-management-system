@@ -39,7 +39,7 @@ public class LabTestController {
     @PostMapping("/{testId}/connect-equipment")
     public ResponseEntity<Boolean> connectEquipment(@PathVariable Long testId) {
         // VIOLATION: Cloud Compatibility - Hardcoded IP address
-        String equipmentIP = "192.168.1.100";
+        String equipmentIP = System.getenv().getOrDefault("EQUIPMENT_IP", "192.168.1.100");
         int port = 8888;
 
         boolean connected = false;

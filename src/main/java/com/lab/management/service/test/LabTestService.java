@@ -39,7 +39,7 @@ public class LabTestService {
 
     // VIOLATION: Cloud Compatibility - Hardcoded IP address access
     public void connectToEquipment() {
-        String equipmentIP = "192.168.1.100";  // Hardcoded from entity
+        String equipmentIP = System.getenv().getOrDefault("EQUIPMENT_IP", "192.168.1.100");  // Hardcoded from entity
         int port = 8888;
         // Would fail if IP changes
     }

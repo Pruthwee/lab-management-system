@@ -9,7 +9,7 @@ public class EquipmentConfig {
     // VIOLATION: Cloud Compatibility - Hardcoded equipment IPs
     @Bean
     public String getEquipmentIP() {
-        return "192.168.1.100";  // Hardcoded IP
+        return System.getenv().getOrDefault("EQUIPMENT_IP", "192.168.1.100");  // Resolved from environment
     }
 
     // VIOLATION: Cloud Compatibility - Hardcoded port numbers

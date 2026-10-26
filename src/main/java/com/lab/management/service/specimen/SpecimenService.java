@@ -29,7 +29,7 @@ public class SpecimenService {
     // VIOLATION: Cloud Compatibility - Using local file system path
     public void storeSpecimenLocally(Specimen specimen, byte[] imageData) {
         // VIOLATION: Software Portability - Windows-specific path
-        String filePath = "C:\\lab\\specimens\\" + specimen.getSpecimenId() + ".img";
+        String filePath = System.getenv().getOrDefault("DATA_PATH", "/app/data") + "/specimens/" + specimen.getSpecimenId() + ".img";
         specimen.setLocalStoragePath(filePath);
         specimenRepository.save(specimen);
     }

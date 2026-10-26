@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 public class LocalStorageProvider implements IStorageProvider {
 
     // VIOLATION: Software Portability - Windows-specific path
-    private static final String BASE_PATH = "C:\\lab\\specimens\\";
+    private static final String BASE_PATH = System.getenv().getOrDefault("DATA_PATH", "/app/data") + "/specimens/";
 
     @Override
     public void uploadFile(String key, byte[] data) throws StorageException {
